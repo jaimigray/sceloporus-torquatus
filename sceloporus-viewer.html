@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<title>Sceloporus torquatus · 3D CT Viewer</title>
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@300;400;500&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root {
+  --bg: #080d0b;
+  --border: rgba(255,255,255,0.07);
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --accent: #4a8a5a;
+  --accent2: #6daa7d;
+  --sans: 'Inter', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+}
+
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--sans);}
+#app{display:flex;flex-direction:column;height:100vh;}
+
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;height:60px;flex-shrink:0;
+  border-bottom:1px solid var(--border);
+  background:rgba(8,13,11,0.97);
+  backdrop-filter:blur(16px);
+}
+.header-left{display:flex;flex-direction:column;gap:3px;}
+.title{font-size:15px;font-weight:600;color:#fff;letter-spacing:-0.01em;}
+.subtitle{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);}
+.header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;}
+.badge{font-size:9px;font-family:var(--mono);letter-spacing:0.1em;text-transform:uppercase;border:1px solid rgba(255,255,255,0.1);color:var(--muted);padding:4px 10px;border-radius:100px;white-space:nowrap;}
+.badge.accent{border-color:rgba(74,138,90,0.4);color:var(--accent2);}
+
+.workspace{display:flex;flex:1;overflow:hidden;min-height:0;}
+.mv-wrap{flex:1;position:relative;min-width:0;min-height:0;}
+model-viewer{
+  display:block;position:absolute;inset:0;width:100%;height:100%;
+  background-color:var(--bg);
+  --progress-bar-color:#4a8a5a;
+  --progress-mask:#080d0b;
+}
+
+.panel-wrap{display:flex;flex-direction:row;flex-shrink:0;transition:width 0.25s ease;width:260px;}
+.panel-wrap.collapsed{width:32px;}
+.panel-collapse-btn{
+  width:32px;flex-shrink:0;background:rgba(8,13,11,0.99);
+  border-left:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--muted);font-size:11px;
+  transition:color 0.15s,background 0.15s;writing-mode:vertical-rl;user-select:none;
+}
+.panel-collapse-btn:hover{color:var(--accent2);background:rgba(74,138,90,0.05);}
+.panel-collapse-btn .arrow{transition:transform 0.25s;display:inline-block;writing-mode:horizontal-tb;}
+.panel-wrap.collapsed .panel-collapse-btn .arrow{transform:rotate(180deg);}
+
+.panel{
+  flex:1;min-width:0;background:rgba(8,13,11,0.99);border-left:1px solid var(--border);
+  display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;transition:opacity 0.2s;
+}
+.panel-wrap.collapsed .panel{opacity:0;pointer-events:none;}
+.panel::-webkit-scrollbar{width:3px;}
+.panel::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);}
+
+.p-section{padding:14px 16px 12px;border-bottom:1px solid var(--border);}
+.p-label{font-size:8px;font-family:var(--mono);letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.p-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.ctrl{display:flex;align-items:center;gap:8px;margin-bottom:9px;}
+.ctrl-l{font-size:10px;color:var(--muted);flex-shrink:0;min-width:64px;line-height:1.3;}
+.ctrl-v{font-size:10px;font-family:var(--mono);color:var(--text);min-width:28px;text-align:right;flex-shrink:0;}
+input[type=range]{flex:1;height:2px;appearance:none;background:rgba(255,255,255,0.08);border-radius:2px;cursor:pointer;min-width:0;}
+input[type=range]::-webkit-slider-thumb{appearance:none;width:10px;height:10px;border-radius:50%;background:var(--accent2);cursor:pointer;box-shadow:0 0 6px rgba(74,138,90,0.6);}
+
+.embryo-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.embryo-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.embryo-name{font-size:10px;color:var(--muted);flex-shrink:0;min-width:54px;}
+.embryo-val{font-size:10px;font-family:var(--mono);color:var(--text);min-width:28px;text-align:right;flex-shrink:0;}
+
+.cam-btns{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.cam-btn{padding:7px 6px;background:transparent;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all 0.15s;text-align:center;}
+.cam-btn:hover{border-color:var(--accent2);color:var(--accent2);background:rgba(74,138,90,0.05);}
+
+.info-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px;gap:8px;}
+.info-k{font-size:9px;font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;flex-shrink:0;}
+.info-v{font-size:10px;color:var(--text);text-align:right;line-height:1.4;}
+.info-v a{color:var(--accent2);text-decoration:none;}
+.info-v a:hover{text-decoration:underline;}
+
+@media(max-width:900px){
+  #app{height:100dvh;}
+  header{padding:0 14px;height:52px;}
+  .title{font-size:13px;}
+  .subtitle{font-size:9px;}
+  .badge:not(.accent){display:none;}
+  .workspace{flex-direction:column;overflow:visible;}
+  .mv-wrap{flex:none;height:calc(100dvh - 52px - 200px);}
+  .panel-wrap{display:block;width:100% !important;flex-shrink:0;}
+  .panel-wrap.collapsed .panel{opacity:1;pointer-events:auto;}
+  .panel-collapse-btn{display:none;}
+  .panel{
+    width:100%;border-left:none;border-top:1px solid var(--border);
+    max-height:200px;overflow-y:auto;overflow-x:hidden;
+    display:flex;flex-direction:row;flex-wrap:wrap;gap:0;
+  }
+  .p-section{flex:1 1 160px;min-width:0;border-bottom:none;border-right:1px solid var(--border);padding:10px 12px;}
+  .p-section:last-child{border-right:none;}
+  input[type=range]{height:4px;}
+  input[type=range]::-webkit-slider-thumb{width:18px;height:18px;}
+  .ctrl{margin-bottom:10px;}
+  .embryo-row{margin-bottom:6px;}
+  .cam-btn{padding:10px 6px;font-size:10px;}
+}
+.panel-toggle{display:none;}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="header-left">
+      <div class="title">Collared Spiny Lizard <span style="font-style:italic;font-weight:300;color:var(--muted);font-size:13px;">Sceloporus torquatus</span></div>
+      <div class="subtitle">3D CT Scan · Herpetology</div>
+    </div>
+    <div class="header-right">
+      <div class="badge accent" id="rot-badge">○ Paused</div>
+      <div class="badge">GLB Model</div>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <div class="mv-wrap">
+      <model-viewer
+        id="mv"
+        src="sceloporus.glb"
+        camera-orbit="90deg 80deg auto"
+        min-camera-orbit="auto auto auto"
+        max-camera-orbit="auto auto 400%"
+        camera-controls
+        shadow-intensity="0.6"
+        exposure="0.9"
+        auto-rotate-delay="0"
+        rotation-per-second="20deg"
+      ></model-viewer>
+    </div>
+
+    <div class="panel-wrap" id="panel-wrap">
+      <div class="panel-collapse-btn" id="collapse-btn">
+        <span class="arrow">◀</span>
+        <span style="margin:6px 0;font-size:8px;letter-spacing:0.15em;">CONTROLS</span>
+      </div>
+      <div class="panel" id="panel">
+
+        <!-- Skeleton -->
+        <div class="p-section">
+          <div class="p-label">Skeleton</div>
+          <div class="ctrl">
+            <span class="ctrl-l">Opacity</span>
+            <input type="range" id="sl-skeleton" min="0" max="1" step="0.01" value="1">
+            <span class="ctrl-v" id="vl-skeleton">1.00</span>
+          </div>
+        </div>
+
+        <!-- Embryos -->
+        <div class="p-section">
+          <div class="p-label">Embryos</div>
+          <div class="embryo-row">
+            <div class="embryo-dot" style="background:#8E133A;"></div>
+            <span class="embryo-name">Embryo 1</span>
+            <input type="range" id="sl-e1" min="0" max="1" step="0.01" value="1" style="flex:1;">
+            <span class="embryo-val" id="vl-e1">1.00</span>
+          </div>
+          <div class="embryo-row">
+            <div class="embryo-dot" style="background:#1C2950;"></div>
+            <span class="embryo-name">Embryo 2</span>
+            <input type="range" id="sl-e2" min="0" max="1" step="0.01" value="1" style="flex:1;">
+            <span class="embryo-val" id="vl-e2">1.00</span>
+          </div>
+          <div class="embryo-row">
+            <div class="embryo-dot" style="background:#5D4A8E;"></div>
+            <span class="embryo-name">Embryo 3</span>
+            <input type="range" id="sl-e3" min="0" max="1" step="0.01" value="1" style="flex:1;">
+            <span class="embryo-val" id="vl-e3">1.00</span>
+          </div>
+          <div class="embryo-row">
+            <div class="embryo-dot" style="background:#9D8CC3;"></div>
+            <span class="embryo-name">Embryo 4</span>
+            <input type="range" id="sl-e4" min="0" max="1" step="0.01" value="1" style="flex:1;">
+            <span class="embryo-val" id="vl-e4">1.00</span>
+          </div>
+          <div class="embryo-row">
+            <div class="embryo-dot" style="background:#7CC8EB;"></div>
+            <span class="embryo-name">Embryo 5</span>
+            <input type="range" id="sl-e5" min="0" max="1" step="0.01" value="1" style="flex:1;">
+            <span class="embryo-val" id="vl-e5">1.00</span>
+          </div>
+          <div class="embryo-row">
+            <div class="embryo-dot" style="background:#D74A20;"></div>
+            <span class="embryo-name">Embryo 6</span>
+            <input type="range" id="sl-e6" min="0" max="1" step="0.01" value="1" style="flex:1;">
+            <span class="embryo-val" id="vl-e6">1.00</span>
+          </div>
+          <div class="embryo-row">
+            <div class="embryo-dot" style="background:#FEB829;"></div>
+            <span class="embryo-name">Embryo 7</span>
+            <input type="range" id="sl-e7" min="0" max="1" step="0.01" value="1" style="flex:1;">
+            <span class="embryo-val" id="vl-e7">1.00</span>
+          </div>
+          <div class="embryo-row">
+            <div class="embryo-dot" style="background:#94A645;"></div>
+            <span class="embryo-name">Embryo 8</span>
+            <input type="range" id="sl-e8" min="0" max="1" step="0.01" value="1" style="flex:1;">
+            <span class="embryo-val" id="vl-e8">1.00</span>
+          </div>
+        </div>
+
+        <!-- Camera -->
+        <div class="p-section">
+          <div class="p-label">Camera</div>
+          <div class="cam-btns">
+            <button class="cam-btn" onclick="setCamera('180deg 80deg auto')">Front</button>
+            <button class="cam-btn" onclick="setCamera('90deg 80deg auto')">Side</button>
+            <button class="cam-btn" onclick="setCamera('180deg 0deg auto')">Top</button>
+            <button class="cam-btn" onclick="setCamera('180deg 160deg auto')">Bottom</button>
+          </div>
+        </div>
+
+        <!-- Info -->
+        <div class="p-section">
+          <div class="p-label">Specimen</div>
+          <div class="info-row"><span class="info-k">Species</span><span class="info-v" style="font-style:italic;">Sceloporus torquatus</span></div>
+          <div class="info-row"><span class="info-k">Common</span><span class="info-v">Collared Spiny Lizard</span></div>
+          <div class="info-row"><span class="info-k">ID</span><span class="info-v">UF:Herp:51331</span></div>
+          <div class="info-row"><span class="info-k">Source</span><span class="info-v"><a href="https://www.morphosource.org/concern/media/000364343?locale=en" target="_blank">MorphoSource 000364343</a></span></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const mv = document.getElementById('mv');
+let matStore = {};
+
+mv.addEventListener('load', () => {
+  (mv.model.materials || []).forEach(m => {
+    const bc = m.pbrMetallicRoughness.baseColorFactor;
+    matStore[m.name] = { mat: m, rgb: [bc[0], bc[1], bc[2]] };
+  });
+});
+
+function sizeMV() {
+  const wrap = mv.parentElement;
+  const r = wrap.getBoundingClientRect();
+  mv.style.setProperty('width',  r.width  + 'px', 'important');
+  mv.style.setProperty('height', r.height + 'px', 'important');
+}
+mv.addEventListener('load', sizeMV);
+window.addEventListener('resize', sizeMV);
+
+function nudge() {
+  const e = parseFloat(mv.getAttribute('exposure') || '0.9');
+  mv.setAttribute('exposure', e + 0.0001);
+  mv.setAttribute('exposure', e);
+}
+
+function setMatOpacity(name, opacity) {
+  const s = matStore[name];
+  if (!s) return;
+  s.mat.setAlphaMode(opacity < 1 ? 'BLEND' : 'OPAQUE');
+  s.mat.pbrMetallicRoughness.setBaseColorFactor([...s.rgb, opacity]);
+  nudge();
+}
+
+function sl(id, valId, matName) {
+  const input = document.getElementById(id);
+  const label = document.getElementById(valId);
+  input.addEventListener('input', () => {
+    const v = parseFloat(input.value);
+    label.textContent = v.toFixed(2);
+    setMatOpacity(matName, v);
+  });
+}
+
+sl('sl-skeleton', 'vl-skeleton', 'skeleton');
+sl('sl-e1', 'vl-e1', 'embryo 1');
+sl('sl-e2', 'vl-e2', 'embryo 2');
+sl('sl-e3', 'vl-e3', 'embryo 3');
+sl('sl-e4', 'vl-e4', 'embryo 4');
+sl('sl-e5', 'vl-e5', 'embryo 5');
+sl('sl-e6', 'vl-e6', 'embryo 6');
+sl('sl-e7', 'vl-e7', 'embryo 7');
+sl('sl-e8', 'vl-e8', 'embryo 8');
+
+function setCamera(orbit) {
+  mv.cameraOrbit = orbit;
+  mv.jumpCameraToGoal();
+}
+
+// Auto-rotate toggle
+const rotBadge = document.getElementById('rot-badge');
+let rotating = false;
+rotBadge.addEventListener('click', () => {
+  rotating = !rotating;
+  mv.setAttribute('auto-rotate', rotating ? '' : null);
+  if (!rotating) mv.removeAttribute('auto-rotate');
+  rotBadge.textContent = rotating ? '↻ Rotating' : '○ Paused';
+});
+
+// Desktop sidebar collapse
+const wrap = document.getElementById('panel-wrap');
+document.getElementById('collapse-btn').addEventListener('click', () => {
+  wrap.classList.toggle('collapsed');
+  wrap.addEventListener('transitionend', sizeMV, { once: true });
+});
+</script>
+</body>
+</html>
