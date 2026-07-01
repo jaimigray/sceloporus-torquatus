@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -119,10 +119,29 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:10px;height:10px;b
   .cam-btn{padding:10px 6px;font-size:10px;}
 }
 .panel-toggle{display:none;}
+.credit-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: #0d1117;
+  color: #ccc;
+  font-size: 12px;
+  text-align: center;
+  padding: 6px 16px;
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+.credit-banner a { text-decoration: none; }
+.credit-banner a:first-child { color: #9ecfef; }
+.credit-banner a:last-child { color: #f4a261; }
+.credit-banner a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
 <div id="app">
+  <div class="credit-banner">Created by <a href="https://graysvertebrateanatomy.com" target="_blank" rel="noopener">Dr. Jaimi A. Gray</a>, <a href="https://www.ctlab.geo.utexas.edu/" target="_blank" rel="noopener">University of Texas High-Resolution X-ray Computed Tomography Facility</a></div>
   <header>
     <div class="header-left">
       <div class="title">Collared Spiny Lizard <span style="font-style:italic;font-weight:300;color:var(--muted);font-size:13px;">Sceloporus torquatus</span></div>
